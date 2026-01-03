@@ -54,6 +54,9 @@ export default function CoursesPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingItem, setDeletingItem] = useState<Course | null>(null);
 
+  // 使用 state 避免 hydration 错误
+  const [writable, setWritable] = useState(false);
+
   async function loadStaff() {
     const res = await apiFetch<Staff[]>("/api/v1/staff");
     if (res.code === 0 && res.data) {
@@ -160,12 +163,11 @@ export default function CoursesPage() {
   }
 
   useEffect(() => {
+    setWritable(canWrite());
     void loadStaff();
     void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const writable = canWrite();
 
   return (
     <main className="grid gap-6">

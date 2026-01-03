@@ -72,6 +72,9 @@ export default function StudentsPage() {
   const [actionType, setActionType] = useState<"graduate" | "transfer-out">("graduate");
   const [actionItem, setActionItem] = useState<Student | null>(null);
 
+  // 使用 state 避免 hydration 错误
+  const [writable, setWritable] = useState(false);
+
   async function loadDepartments() {
     const res = await apiFetch<Department[]>("/api/v1/departments");
     if (res.code === 0 && res.data) {
@@ -196,12 +199,11 @@ export default function StudentsPage() {
   }
 
   useEffect(() => {
+    setWritable(canWrite());
     void loadDepartments();
     void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const writable = canWrite();
 
   return (
     <main className="grid gap-6">

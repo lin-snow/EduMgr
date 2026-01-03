@@ -34,6 +34,9 @@ export default function GradesPage() {
   const [byStudentStudentNo, setByStudentStudentNo] = useState("");
   const [byStudentItems, setByStudentItems] = useState("C001,80,90,88\nC002,70,80,76");
 
+  // 使用 state 避免 hydration 错误
+  const [gradeEditable, setGradeEditable] = useState(false);
+
   const summary = useMemo(() => {
     const c = groups.length;
     const s = groups.reduce((acc, g) => acc + (g.rows?.length ?? 0), 0);
@@ -111,11 +114,10 @@ export default function GradesPage() {
   }
 
   useEffect(() => {
+    setGradeEditable(canGrade());
     void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const gradeEditable = canGrade();
 
   return (
     <main className="grid gap-6">

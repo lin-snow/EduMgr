@@ -47,6 +47,9 @@ export default function DepartmentsPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingItem, setDeletingItem] = useState<Department | null>(null);
 
+  // 使用 state 避免 hydration 错误
+  const [writable, setWritable] = useState(false);
+
   async function load() {
     setErr(null);
     setLoading(true);
@@ -128,11 +131,10 @@ export default function DepartmentsPage() {
   }
 
   useEffect(() => {
+    setWritable(canWrite());
     void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const writable = canWrite();
 
   return (
     <main className="grid gap-6">

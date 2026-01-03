@@ -62,6 +62,9 @@ export default function EnrollmentsPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingItem, setDeletingItem] = useState<Enrollment | null>(null);
 
+  // 使用 state 避免 hydration 错误
+  const [writable, setWritable] = useState(false);
+
   async function loadTerms() {
     const res = await apiFetch<Term[]>("/api/v1/terms");
     if (res.code === 0 && res.data) {
@@ -168,12 +171,11 @@ export default function EnrollmentsPage() {
   }
 
   useEffect(() => {
+    setWritable(canWrite());
     void loadTerms();
     void loadEnrollments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const writable = canWrite();
 
   // 计算学生在当前学期的总学分
   const studentCredits = (studentNo: string, termCode: string) => {

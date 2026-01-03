@@ -56,6 +56,9 @@ export default function StaffPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingItem, setDeletingItem] = useState<Staff | null>(null);
 
+  // 使用 state 避免 hydration 错误
+  const [writable, setWritable] = useState(false);
+
   async function loadDepartments() {
     const res = await apiFetch<Department[]>("/api/v1/departments");
     if (res.code === 0 && res.data) {
@@ -162,12 +165,11 @@ export default function StaffPage() {
   }
 
   useEffect(() => {
+    setWritable(canWrite());
     void loadDepartments();
     void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const writable = canWrite();
 
   return (
     <main className="grid gap-6">
