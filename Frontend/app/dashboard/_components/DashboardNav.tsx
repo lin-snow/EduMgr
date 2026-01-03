@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { clearToken, getToken, getUser, fetchCurrentUser, type User } from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -20,30 +20,37 @@ const roleLabels: Record<string, string> = {
   student: "学生",
 };
 
+// 获取初始用户状态（同步）
+function getInitialUser(): User | null {
+  if (typeof window === "undefined") return null;
+  const token = getToken();
+  if (!token) return null;
+  return getUser();
+}
+
 export function DashboardNav() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(getInitialUser);
+  const [loading, setLoading] = useState(() => typeof window !== "undefined" && !!getToken());
 
-  useEffect(() => {
+  const loadUser = useCallback(async () => {
     const token = getToken();
     if (!token) {
       setLoading(false);
       return;
     }
-    // 先从本地获取用户信息
-    const cached = getUser();
-    if (cached) {
-      setUser(cached);
+    // 异步刷新用户信息
+    try {
+      const u = await fetchCurrentUser();
+      if (u) setUser(u);
+    } finally {
       setLoading(false);
     }
-    // 异步刷新用户信息
-    fetchCurrentUser()
-      .then((u) => {
-        if (u) setUser(u);
-      })
-      .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    loadUser();
+  }, [loadUser]);
 
   const handleLogout = () => {
     clearToken();

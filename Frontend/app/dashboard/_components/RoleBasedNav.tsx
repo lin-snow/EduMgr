@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { getUser, type UserRole } from "@/lib/api";
@@ -44,14 +44,16 @@ const allLinks: NavLink[] = [
   { href: "/dashboard/my-grades", label: "我的成绩", icon: Award, roles: ["student"] },
 ];
 
-export function RoleBasedNav({ className, mobile = false }: { className?: string; mobile?: boolean }) {
-  const [role, setRole] = useState<UserRole | null>(null);
-  const pathname = usePathname();
+// 获取用户角色（同步）
+function getUserRole(): UserRole | null {
+  if (typeof window === "undefined") return null;
+  const user = getUser();
+  return user?.role ?? null;
+}
 
-  useEffect(() => {
-    const user = getUser();
-    setRole(user?.role ?? null);
-  }, []);
+export function RoleBasedNav({ className, mobile = false }: { className?: string; mobile?: boolean }) {
+  const pathname = usePathname();
+  const role = useMemo(() => getUserRole(), []);
 
   // 根据角色过滤链接
   const visibleLinks = allLinks.filter((link) => {

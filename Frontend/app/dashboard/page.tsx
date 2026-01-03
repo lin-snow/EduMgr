@@ -67,66 +67,56 @@ type MyGrade = {
   final_score: number | null;
 };
 
+// 获取初始用户（同步）
+function getInitialUser(): User | null {
+  if (typeof window === "undefined") return null;
+  return getUser();
+}
+
 export default function DashboardHome() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user] = useState<User | null>(getInitialUser);
   const [stats, setStats] = useState<Stats | null>(null);
   // 学生专属数据
   const [studentEnrollments, setStudentEnrollments] = useState<Enrollment[]>([]);
   const [studentGrades, setStudentGrades] = useState<MyGrade[]>([]);
 
   useEffect(() => {
-    const cachedUser = getUser();
-    if (cachedUser) {
-      setUser(cachedUser);
+    if (!user) return;
 
-      if (cachedUser.role === "admin") {
-        // 管理员加载统计数据
-        loadAdminStats();
-      } else if (cachedUser.role === "student") {
-        // 学生加载自己的数据
-        loadStudentData();
-      }
-    }
-  }, []);
-
-  async function loadAdminStats() {
-    try {
-      const [depts, students, staff, courses] = await Promise.all([
+    if (user.role === "admin") {
+      // 管理员加载统计数据
+      Promise.all([
         apiFetch<unknown[]>("/api/v1/departments"),
         apiFetch<unknown[]>("/api/v1/students"),
         apiFetch<unknown[]>("/api/v1/staff"),
         apiFetch<unknown[]>("/api/v1/courses"),
-      ]);
-
-      setStats({
-        departments: Array.isArray(depts.data) ? depts.data.length : 0,
-        students: Array.isArray(students.data) ? students.data.length : 0,
-        staff: Array.isArray(staff.data) ? staff.data.length : 0,
-        courses: Array.isArray(courses.data) ? courses.data.length : 0,
+      ]).then(([depts, students, staff, courses]) => {
+        setStats({
+          departments: Array.isArray(depts.data) ? depts.data.length : 0,
+          students: Array.isArray(students.data) ? students.data.length : 0,
+          staff: Array.isArray(staff.data) ? staff.data.length : 0,
+          courses: Array.isArray(courses.data) ? courses.data.length : 0,
+        });
+      }).catch(() => {
+        // 忽略错误
       });
-    } catch {
-      // 忽略错误
-    }
-  }
-
-  async function loadStudentData() {
-    try {
-      const [enrollRes, gradesRes] = await Promise.all([
+    } else if (user.role === "student") {
+      // 学生加载自己的数据
+      Promise.all([
         apiFetch<Enrollment[]>("/api/v1/enrollments/my"),
         apiFetch<MyGrade[]>("/api/v1/grades/my"),
-      ]);
-
-      if (enrollRes.code === 0) {
-        // Backend returns array directly
-        setStudentEnrollments(enrollRes.data ?? []);
-      }
-      if (gradesRes.code === 0) {
-        setStudentGrades(gradesRes.data ?? []);
-      }
-    } catch {
-      // 忽略错误
+      ]).then(([enrollRes, gradesRes]) => {
+        if (enrollRes.code === 0) {
+          setStudentEnrollments(enrollRes.data ?? []);
+        }
+        if (gradesRes.code === 0) {
+          setStudentGrades(gradesRes.data ?? []);
+        }
+      }).catch(() => {
+        // 忽略错误
+      });
     }
-  }
+  }, [user]);
 
   // 根据角色过滤链接
   const visibleLinks = allLinks.filter((link) => {

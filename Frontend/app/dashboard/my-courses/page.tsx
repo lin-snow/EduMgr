@@ -6,7 +6,6 @@ import { Section } from "../_components/Section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -19,14 +18,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { BookMarked, Clock, MapPin, User, Award, CheckCircle2, Plus } from "lucide-react";
-
-type EnrollmentListResult = {
-  items: Enrollment[];
-  total: number;
-  page: number;
-  size: number;
-};
+import { Clock, MapPin, User, Award, CheckCircle2, Plus } from "lucide-react";
 
 export default function MyCoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);

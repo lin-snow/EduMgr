@@ -21,13 +21,6 @@ import {
 import { BookOpen, Clock, Trash2 } from "lucide-react";
 import Link from "next/link";
 
-type EnrollmentListResult = {
-  items: Enrollment[];
-  total: number;
-  page: number;
-  size: number;
-};
-
 export default function MyEnrollmentsPage() {
   const [terms, setTerms] = useState<Term[]>([]);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);

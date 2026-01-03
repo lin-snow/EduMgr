@@ -38,7 +38,18 @@ func main() {
 
 	e.Use(middleware.Recover())
 	e.Use(middleware.RequestID())
-	e.Use(middleware.Logger())
+	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+		LogStatus:   true,
+		LogURI:      true,
+		LogMethod:   true,
+		LogLatency:  true,
+		LogRemoteIP: true,
+		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+			log.Printf("[%s] %s %s %d %v",
+				v.RemoteIP, v.Method, v.URI, v.Status, v.Latency)
+			return nil
+		},
+	}))
 	e.Use(middleware.CORS())
 
 	// Register routes

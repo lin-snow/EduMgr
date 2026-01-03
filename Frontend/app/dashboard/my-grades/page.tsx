@@ -21,22 +21,23 @@ type MyGrade = {
 export default function MyGradesPage() {
   const [grades, setGrades] = useState<MyGrade[]>([]);
   const [err, setErr] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  async function loadMyGrades() {
-    setLoading(true);
-    setErr(null);
-    const res = await apiFetch<MyGrade[]>("/api/v1/grades/my");
-    setLoading(false);
-    if (res.code !== 0) {
-      setErr(res.message);
-      return;
-    }
-    setGrades(res.data ?? []);
-  }
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    void loadMyGrades();
+    apiFetch<MyGrade[]>("/api/v1/grades/my")
+      .then((res) => {
+        if (res.code !== 0) {
+          setErr(res.message);
+          return;
+        }
+        setGrades(res.data ?? []);
+      })
+      .catch(() => {
+        setErr("加载失败");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   // 计算统计数据
