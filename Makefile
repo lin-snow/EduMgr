@@ -3,7 +3,7 @@
 # =============================================================================
 
 .PHONY: help dev dev-backend dev-frontend dev-db build build-backend build-frontend \
-        up down logs clean migrate seed test
+        up down logs clean migrate seed test gen
 
 # Default target
 .DEFAULT_GOAL := help
@@ -50,6 +50,9 @@ help: ## Show this help message
 	@echo "  make migrate-down - 回滚数据库迁移"
 	@echo "  make seed         - 导入测试数据"
 	@echo "  make db-reset     - 重置数据库（危险！）"
+	@echo ""
+	@echo "$(GREEN)代码生成:$(NC)"
+	@echo "  make gen    - 运行 Wire 依赖注入代码生成"
 	@echo ""
 	@echo "$(GREEN)其他:$(NC)"
 	@echo "  make clean  - 清理构建产物"
@@ -183,6 +186,14 @@ clean-all: clean ## 清理所有（包括 Docker 镜像和数据卷）
 	@$(DOCKER_COMPOSE) down -v --rmi local
 	@docker rmi edumgr-backend:latest edumgr-frontend:latest 2>/dev/null || true
 	@echo "$(GREEN)>>> 全部清理完成$(NC)"
+
+# =============================================================================
+# Code Generation
+# =============================================================================
+gen: ## 运行 Wire 依赖注入代码生成
+	@echo "$(CYAN)>>> 运行 Wire 依赖注入生成...$(NC)"
+	@cd $(BACKEND_DIR)/cmd/api && wire
+	@echo "$(GREEN)>>> Wire 生成完成: $(BACKEND_DIR)/cmd/api/wire_gen.go$(NC)"
 
 # =============================================================================
 # Test
