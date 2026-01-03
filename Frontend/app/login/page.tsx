@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { apiBase, setToken } from "@/lib/api";
+import { apiBase, setToken, setUser } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,6 +37,7 @@ export default function LoginPage() {
         return;
       }
       setToken(json.data.token);
+      setUser(json.data.user as { id: number; username: string; role: "student" | "teacher" | "admin" });
       router.push("/dashboard");
     } catch {
       setError("网络错误");
@@ -50,7 +51,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>EduMgr 登录</CardTitle>
-          <CardDescription>请输入账号密码获取 JWT。</CardDescription>
+          <CardDescription>请输入账号密码登录系统。</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} className="grid gap-4">
@@ -76,4 +77,3 @@ export default function LoginPage() {
     </main>
   );
 }
-
