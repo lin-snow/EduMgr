@@ -25,7 +25,7 @@
 | 前端       | Next.js && Shadcn UI+TailwindCSS | 丰富的组件生态与方便的UI设计                       |
 | 后端       | Golang + Echo                    | 高性能 Web 框架，支持中间件、路由和 REST API。     |
 | ORM        | GORM                             | Golang ORM，用于对象关系映射与数据库操作。         |
-| 数据库迁移 | golang-migrate                   | 管理数据库 SQL 文件版本和迁移。                    |
+| 数据库迁移 | golang-migrate                   | 管理数据库 SQL 文件版本和迁移，数据库初始化。                    |
 | 数据库     | PostgreSQL                       | 开源关系型数据库，支持事务、索引、完整性约束。     |
 | 认证授权   | JWT / Role-based                 | 基于角色的权限控制，分配学生、教师、管理员等权限。 |
 
