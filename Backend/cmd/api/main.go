@@ -49,6 +49,7 @@ func main() {
 	// CRUD (read: admin/teacher; write: admin)
 	ro := api.Group("")
 	ro.Use(appmw.RequireRole("admin", "teacher"))
+	ro.Use(appmw.WriteAdminOnly())
 	handler.RegisterDepartments(ro, gdb)
 	handler.RegisterStudents(ro, gdb)
 	handler.RegisterStaff(ro, gdb)

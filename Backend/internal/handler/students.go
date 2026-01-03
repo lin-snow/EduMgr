@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
@@ -98,5 +99,67 @@ func RegisterStudents(g *echo.Group, gdb *gorm.DB) {
 		}
 		return c.JSON(http.StatusOK, OK(map[string]any{"deleted": true}))
 	})
+
+	// PRD 3.1.3: 学籍异动（毕业/转出/转入）
+	// 说明：为避免破坏 enrollments/grades 外键，本实现采用“标记状态 + 写入历史表”的方式。
+	g.POST("/students/:id/graduate", func(c echo.Context) error {
+		return archiveStudent(c, gdb, "graduated", "graduate")
+	})
+	g.POST("/students/:id/transfer-out", func(c echo.Context) error {
+		return archiveStudent(c, gdb, "transfer_out", "transfer_out")
+	})
+	g.POST("/students/:id/transfer-in", func(c echo.Context) error {
+		id, err := pathUint(c, "id")
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, Err(40003, "invalid id"))
+		}
+		var stu model.Student
+		if err := gdb.First(&stu, id).Error; err != nil {
+			return c.JSON(http.StatusNotFound, Err(40401, "not found"))
+		}
+		stu.Status = "transfer_in"
+		if err := gdb.Save(&stu).Error; err != nil {
+			return c.JSON(http.StatusBadRequest, Err(40011, "update failed"))
+		}
+		return c.JSON(http.StatusOK, OK(stu))
+	})
+}
+
+func archiveStudent(c echo.Context, gdb *gorm.DB, newStatus string, reason string) error {
+	id, err := pathUint(c, "id")
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, Err(40003, "invalid id"))
+	}
+	var stu model.Student
+	if err := gdb.First(&stu, id).Error; err != nil {
+		return c.JSON(http.StatusNotFound, Err(40401, "not found"))
+	}
+
+	now := time.Now()
+	h := model.StudentHistory{
+		StudentNo:     stu.StudentNo,
+		Name:          stu.Name,
+		Gender:        stu.Gender,
+		BirthDate:     stu.BirthDate,
+		EntryScore:    stu.EntryScore,
+		DeptID:        stu.DeptID,
+		Status:        newStatus,
+		ArchivedAt:    now,
+		ArchiveReason: reason,
+	}
+
+	if err := gdb.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(&h).Error; err != nil {
+			return err
+		}
+		stu.Status = newStatus
+		if err := tx.Save(&stu).Error; err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
+		return c.JSON(http.StatusBadRequest, Err(40050, "archive failed"))
+	}
+	return c.JSON(http.StatusOK, OK(map[string]any{"archived": true}))
 }
 
