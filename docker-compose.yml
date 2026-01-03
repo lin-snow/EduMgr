@@ -1,20 +1,44 @@
+# =============================================================================
+# EduMgr Docker Compose Configuration
+# =============================================================================
+# 使用方法:
+#   开发模式: make dev (只启动数据库，本地运行前后端)
+#   生产模式: make up  (启动所有容器)
+# =============================================================================
+
 services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL Database
+  # ---------------------------------------------------------------------------
   db:
-    image: postgres:16
+    image: postgres:16-alpine
+    container_name: edumgr-db
     environment:
       POSTGRES_USER: edumgr
       POSTGRES_PASSWORD: edumgr
       POSTGRES_DB: edumgr
+      TZ: Asia/Shanghai
     ports:
       - "5432:5432"
     volumes:
       - edumgr_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U edumgr"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
+  # ---------------------------------------------------------------------------
+  # Backend API (Go + Echo)
+  # ---------------------------------------------------------------------------
   backend:
     build:
       context: ./Backend
+      dockerfile: Dockerfile
+    container_name: edumgr-backend
     environment:
-      APP_ENV: dev
+      APP_ENV: production
       APP_PORT: 8080
       DB_HOST: db
       DB_PORT: 5432
@@ -22,23 +46,39 @@ services:
       DB_PASSWORD: edumgr
       DB_NAME: edumgr
       DB_SSLMODE: disable
-      JWT_SECRET: change-me-in-prod
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-prod}
       JWT_EXPIRES_MINUTES: 720
+      TZ: Asia/Shanghai
     ports:
       - "8080:8080"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    restart: unless-stopped
 
+  # ---------------------------------------------------------------------------
+  # Frontend (Next.js)
+  # ---------------------------------------------------------------------------
   frontend:
     build:
       context: ./Frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE: http://localhost:8080
+    container_name: edumgr-frontend
     environment:
       NEXT_PUBLIC_API_BASE: http://localhost:8080
+      TZ: Asia/Shanghai
     ports:
       - "3000:3000"
     depends_on:
       - backend
+    restart: unless-stopped
 
+# =============================================================================
+# Volumes
+# =============================================================================
 volumes:
   edumgr_pg:
+    name: edumgr_pg
 
