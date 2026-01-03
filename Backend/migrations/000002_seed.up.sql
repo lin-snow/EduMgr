@@ -281,14 +281,14 @@ INSERT INTO grades (student_id, course_id, usual_score, exam_score, final_score)
 -- 密码 hash 对应 "password123"
 INSERT INTO users (username, password_hash, role, student_id, staff_id) VALUES
 -- 管理员账号
-('admin', '$2a$10$rQnM1.V4GEYvPcLlvRhPxOzKzFGZ3HqVhqQpQEsUwP1fUfJVjKqOe', 'admin', NULL, NULL),
+('admin', '$2a$10$jqC/K39kI0n7d79.NAc.QOfysuhBf33vQw9Zc7mxgWy0b86KVs2US', 'admin', NULL, NULL),
 -- 教师账号 (绑定教职工)
-('zhangming', '$2a$10$rQnM1.V4GEYvPcLlvRhPxOzKzFGZ3HqVhqQpQEsUwP1fUfJVjKqOe', 'teacher', NULL, 1),
-('lihua', '$2a$10$rQnM1.V4GEYvPcLlvRhPxOzKzFGZ3HqVhqQpQEsUwP1fUfJVjKqOe', 'teacher', NULL, 2),
-('wangqiang', '$2a$10$rQnM1.V4GEYvPcLlvRhPxOzKzFGZ3HqVhqQpQEsUwP1fUfJVjKqOe', 'teacher', NULL, 3),
-('chenjing', '$2a$10$rQnM1.V4GEYvPcLlvRhPxOzKzFGZ3HqVhqQpQEsUwP1fUfJVjKqOe', 'teacher', NULL, 4),
+('zhangming', '$2a$10$jqC/K39kI0n7d79.NAc.QOfysuhBf33vQw9Zc7mxgWy0b86KVs2US', 'teacher', NULL, 1),
+('lihua', '$2a$10$jqC/K39kI0n7d79.NAc.QOfysuhBf33vQw9Zc7mxgWy0b86KVs2US', 'teacher', NULL, 2),
+('wangqiang', '$2a$10$jqC/K39kI0n7d79.NAc.QOfysuhBf33vQw9Zc7mxgWy0b86KVs2US', 'teacher', NULL, 3),
+('chenjing', '$2a$10$jqC/K39kI0n7d79.NAc.QOfysuhBf33vQw9Zc7mxgWy0b86KVs2US', 'teacher', NULL, 4),
 -- 学生账号 (绑定学生)
-('zhangsan', '$2a$10$rQnM1.V4GEYvPcLlvRhPxOzKzFGZ3HqVhqQpQEsUwP1fUfJVjKqOe', 'student', 1, NULL),
-('lisi', '$2a$10$rQnM1.V4GEYvPcLlvRhPxOzKzFGZ3HqVhqQpQEsUwP1fUfJVjKqOe', 'student', 2, NULL),
-('wangwu', '$2a$10$rQnM1.V4GEYvPcLlvRhPxOzKzFGZ3HqVhqQpQEsUwP1fUfJVjKqOe', 'student', 3, NULL),
-('zhaoliu', '$2a$10$rQnM1.V4GEYvPcLlvRhPxOzKzFGZ3HqVhqQpQEsUwP1fUfJVjKqOe', 'student', 4, NULL);
+('zhangsan', '$2a$10$jqC/K39kI0n7d79.NAc.QOfysuhBf33vQw9Zc7mxgWy0b86KVs2US', 'student', 1, NULL),
+('lisi', '$2a$10$jqC/K39kI0n7d79.NAc.QOfysuhBf33vQw9Zc7mxgWy0b86KVs2US', 'student', 2, NULL),
+('wangwu', '$2a$10$jqC/K39kI0n7d79.NAc.QOfysuhBf33vQw9Zc7mxgWy0b86KVs2US', 'student', 3, NULL),
+('zhaoliu', '$2a$10$jqC/K39kI0n7d79.NAc.QOfysuhBf33vQw9Zc7mxgWy0b86KVs2US', 'student', 4, NULL);
