@@ -6,6 +6,8 @@
 
 本系统为 **教学管理系统**，主要实现对学生、教职工、系、课程及成绩信息的管理。系统采用 **B/S 架构**，前端使用 **Nuxt.js** 框架，后端采用 **Golang + Echo** 框架，数据库使用 **PostgreSQL**，数据库访问使用 **GORM**，数据库初始化和版本管理使用 **golang-migrate**。
 
+> 说明：本仓库实际实现以前端 **Next.js + Shadcn UI + TailwindCSS** 为准（见下方技术选型），不再使用 Nuxt.js。
+
 系统功能包括：
 
 1. 学生信息管理（增删改查、转学、毕业、历史数据存储）。
@@ -79,3 +81,28 @@
 Golang包名使用：github.com/lin-snow/edumgr
 
 使用Docker Compose部署使用
+
+---
+
+## 五、快速开始（Docker Compose）
+
+> 需要你的本机/环境具备网络以拉取镜像与安装依赖。
+
+```bash
+docker compose up --build
+```
+
+- Frontend: `http://localhost:3000`
+- Backend: `http://localhost:8080/healthz`
+
+---
+
+## 六、前端本地开发（pnpm）
+
+在 `Frontend/` 目录下：
+
+```bash
+corepack enable
+pnpm install
+pnpm dev
+```
