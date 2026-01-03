@@ -69,6 +69,14 @@ export default function EnrollmentsPage() {
     }
   }
 
+  // 分页响应类型
+  type EnrollmentListResult = {
+    items: Enrollment[];
+    total: number;
+    page: number;
+    size: number;
+  };
+
   async function loadEnrollments() {
     setErr(null);
     setLoading(true);
@@ -76,13 +84,14 @@ export default function EnrollmentsPage() {
     if (filterTermCode) qs.set("term_code", filterTermCode);
     if (filterStudentNo) qs.set("student_no", filterStudentNo);
     if (filterCourseNo) qs.set("course_no", filterCourseNo);
-    const res = await apiFetch<Enrollment[]>(`/api/v1/enrollments?${qs.toString()}`);
+    const res = await apiFetch<EnrollmentListResult>(`/api/v1/enrollments?${qs.toString()}`);
     setLoading(false);
     if (res.code !== 0) {
       setErr(res.message);
       return;
     }
-    setEnrollments(res.data ?? []);
+    // 后端返回 { items: [], total, page, size } 分页格式
+    setEnrollments(res.data?.items ?? []);
   }
 
   async function createTerm() {
@@ -220,18 +229,24 @@ export default function EnrollmentsPage() {
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Label>学期</Label>
-              <Select value={termCode} onValueChange={setTermCode}>
-                <SelectTrigger>
-                  <SelectValue placeholder="选择学期" />
-                </SelectTrigger>
-                <SelectContent>
-                  {terms.map((t) => (
-                    <SelectItem key={t.id} value={t.term_code}>
-                      {t.term_code} - {t.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {terms.length > 0 ? (
+                <Select value={termCode || undefined} onValueChange={setTermCode}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="选择学期" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {terms.map((t) => (
+                      <SelectItem key={t.id} value={t.term_code}>
+                        {t.term_code} - {t.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <div className="rounded-md border border-border px-3 py-2 text-sm text-muted-foreground">
+                  请先创建学期
+                </div>
+              )}
             </div>
             <div className="grid gap-2">
               <Label>单个学生（与下方多个学生二选一）</Label>
@@ -280,12 +295,15 @@ export default function EnrollmentsPage() {
       <Section title="选课记录查询">
         <div className="grid gap-4">
           <div className="grid gap-3 sm:grid-cols-4">
-            <Select value={filterTermCode} onValueChange={setFilterTermCode}>
+            <Select 
+              value={filterTermCode || "__all__"} 
+              onValueChange={(v) => setFilterTermCode(v === "__all__" ? "" : v)}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="筛选学期" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">全部学期</SelectItem>
+                <SelectItem value="__all__">全部学期</SelectItem>
                 {terms.map((t) => (
                   <SelectItem key={t.id} value={t.term_code}>
                     {t.term_code}
