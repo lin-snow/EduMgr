@@ -75,18 +75,24 @@ export default function MyCoursesPage() {
     // /enrollments/my returns array directly, not paginated result
     const res = await apiFetch<Enrollment[]>("/api/v1/enrollments/my");
     if (res.code === 0) {
-      // Filter by selected term
-      const filtered = (res.data ?? []).filter(e => e.term_code === selectedTerm);
-      setMyEnrollments(filtered);
+      setMyEnrollments(res.data ?? []);
     }
   }
 
-  // 计算已选学分
-  const totalCredits = myEnrollments.reduce((sum, e) => sum + (e.credits || 0), 0);
+  // 当前学期的选课（用于计算学分）
+  const currentTermEnrollments = myEnrollments.filter(e => e.term_code === selectedTerm);
+  // 计算当前学期已选学分
+  const totalCredits = currentTermEnrollments.reduce((sum, e) => sum + (e.credits || 0), 0);
 
-  // 检查课程是否已选
+  // 检查课程是否已选（任意学期）
   const isEnrolled = (courseNo: string) => {
     return myEnrollments.some((e) => e.course_no === courseNo);
+  };
+
+  // 获取课程的选课学期（如果已选）
+  const getEnrolledTerm = (courseNo: string) => {
+    const enrollment = myEnrollments.find((e) => e.course_no === courseNo);
+    return enrollment?.term_code;
   };
 
   function openEnrollDialog(course: Course) {
@@ -235,7 +241,11 @@ export default function MyCoursesPage() {
                     {enrolled ? (
                       <Button variant="outline" disabled className="w-full">
                         <CheckCircle2 className="mr-2 h-4 w-4 text-green-600" />
-                        已选修
+                        已选修{getEnrolledTerm(course.course_no) !== selectedTerm && (
+                          <span className="ml-1 text-xs text-muted-foreground">
+                            ({getEnrolledTerm(course.course_no)})
+                          </span>
+                        )}
                       </Button>
                     ) : (
                       <Button

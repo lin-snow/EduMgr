@@ -168,7 +168,10 @@ export default function ReportsPage() {
         </div>
       </Section>
 
-      <Section title={mode === "roster" ? "成绩登记表输出" : "成绩报表输出"}>
+      <Section 
+        title={mode === "roster" ? "成绩登记表输出" : "成绩报表输出"}
+        description={mode === "roster" ? "空白登记表，用于打印后手工填写成绩。如需查看已录入成绩，请切换到「成绩报表」" : "显示已录入成绩及分段统计"}
+      >
         <div className="grid gap-6">
           {items.map((c) => (
             <div key={c.course_no} className="rounded-lg border border-border bg-card print:break-inside-avoid">
