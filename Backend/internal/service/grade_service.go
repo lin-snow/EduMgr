@@ -54,10 +54,21 @@ type GradeQueryParams struct {
 	DeptNo      string
 }
 
+// MyGradeItem represents a student's own grade (flat structure for frontend)
+type MyGradeItem struct {
+	CourseNo   string   `json:"course_no"`
+	CourseName string   `json:"course_name"`
+	Credits    int      `json:"credits"`
+	TermCode   string   `json:"term_code"`
+	UsualScore *float64 `json:"usual_score"`
+	ExamScore  *float64 `json:"exam_score"`
+	FinalScore *float64 `json:"final_score"`
+}
+
 // GradeService defines the interface for grade business logic
 type GradeService interface {
 	Query(params GradeQueryParams) ([]CourseGradeGroup, error)
-	QueryMyGrades(userID uint) ([]CourseGradeGroup, error)
+	QueryMyGrades(userID uint) ([]MyGradeItem, error)
 	UpsertByCourse(courseNo string, items []GradeItem, role string, userID uint) error
 	UpsertByStudent(studentNo string, items []GradeItem, role string, userID uint) error
 }
@@ -145,19 +156,31 @@ func (s *gradeService) Query(params GradeQueryParams) ([]CourseGradeGroup, error
 	return result, nil
 }
 
-// QueryMyGrades returns grades for the current student user
-func (s *gradeService) QueryMyGrades(userID uint) ([]CourseGradeGroup, error) {
+// QueryMyGrades returns grades for the current student user (flat structure)
+func (s *gradeService) QueryMyGrades(userID uint) ([]MyGradeItem, error) {
 	user, err := s.userRepo.FindByID(userID)
 	if err != nil || user.StudentID == nil {
 		return nil, pkg.NewAppError(pkg.ErrCodeStudentNotBound, "student not bound")
 	}
 
-	student, err := s.studentRepo.FindByID(*user.StudentID)
+	rows, err := s.gradeRepo.FindByStudentID(*user.StudentID)
 	if err != nil {
-		return nil, pkg.NewAppError(pkg.ErrCodeStudentNotFound, "student not found")
+		return nil, pkg.WrapError(pkg.ErrCodeDBError, "database error", err)
 	}
 
-	return s.Query(GradeQueryParams{StudentNo: student.StudentNo})
+	result := make([]MyGradeItem, len(rows))
+	for i, r := range rows {
+		result[i] = MyGradeItem{
+			CourseNo:   r.CourseNo,
+			CourseName: r.CourseName,
+			Credits:    r.Credits,
+			TermCode:   r.TermCode,
+			UsualScore: r.UsualScore,
+			ExamScore:  r.ExamScore,
+			FinalScore: r.FinalScore,
+		}
+	}
+	return result, nil
 }
 
 // checkTeacherCoursePermission checks if teacher can modify grades for the course

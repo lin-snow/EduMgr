@@ -88,7 +88,15 @@ func registerRoutes(e *echo.Echo, h *server.Handlers, cfg config.Config) {
 	h.Department.Register(ro)
 	h.Student.Register(ro)
 	h.Staff.Register(ro)
-	h.Course.Register(ro)
+	// Course write routes (admin only via WriteAdminOnly)
+	ro.POST("/courses", h.Course.Create)
+	ro.PUT("/courses/:id", h.Course.Update)
+	ro.DELETE("/courses/:id", h.Course.Delete)
+
+	// Courses list - all authenticated users can view (for student course selection)
+	courseReadAPI := api.Group("")
+	courseReadAPI.Use(appmw.RequireRole("admin", "teacher", "student"))
+	courseReadAPI.GET("/courses", h.Course.List)
 
 	// Terms (all authenticated users can view)
 	termAPI := api.Group("")

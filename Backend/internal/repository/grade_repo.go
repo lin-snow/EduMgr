@@ -28,6 +28,17 @@ type GradeQueryRow struct {
 	FinalScore  *float64 `json:"final_score"`
 }
 
+// StudentGradeRow represents a student's grade with term info
+type StudentGradeRow struct {
+	CourseNo   string   `json:"course_no"`
+	CourseName string   `json:"course_name"`
+	Credits    int      `json:"credits"`
+	TermCode   string   `json:"term_code"`
+	UsualScore *float64 `json:"usual_score"`
+	ExamScore  *float64 `json:"exam_score"`
+	FinalScore *float64 `json:"final_score"`
+}
+
 // GradeQueryParams represents the query parameters for grades
 type GradeQueryParams struct {
 	StudentNo   string
@@ -41,6 +52,7 @@ type GradeQueryParams struct {
 // GradeRepository defines the interface for grade data access
 type GradeRepository interface {
 	FindByFilters(params GradeQueryParams) ([]GradeQueryRow, error)
+	FindByStudentID(studentID uint) ([]StudentGradeRow, error)
 	FindByStudentAndCourse(studentID, courseID uint) (*model.Grade, error)
 	Create(grade *model.Grade) error
 	Update(grade *model.Grade) error
@@ -108,6 +120,26 @@ func (r *gradeRepo) FindByFilters(params GradeQueryParams) ([]GradeQueryRow, err
 	return rows, nil
 }
 
+func (r *gradeRepo) FindByStudentID(studentID uint) ([]StudentGradeRow, error) {
+	var rows []StudentGradeRow
+	err := r.db.Table("grades").
+		Select(`
+			courses.course_no, courses.name AS course_name, courses.credits,
+			COALESCE(terms.term_code, '') AS term_code,
+			grades.usual_score, grades.exam_score, grades.final_score
+		`).
+		Joins("JOIN courses ON courses.id = grades.course_id").
+		Joins("LEFT JOIN enrollments ON enrollments.student_id = grades.student_id AND enrollments.course_id = grades.course_id").
+		Joins("LEFT JOIN terms ON terms.id = enrollments.term_id").
+		Where("grades.student_id = ?", studentID).
+		Order("terms.term_code DESC, courses.course_no ASC").
+		Scan(&rows).Error
+	if err != nil {
+		return nil, err
+	}
+	return rows, nil
+}
+
 func (r *gradeRepo) FindByStudentAndCourse(studentID, courseID uint) (*model.Grade, error) {
 	var grade model.Grade
 	if err := r.db.Where("student_id = ? AND course_id = ?", studentID, courseID).First(&grade).Error; err != nil {
@@ -129,7 +161,7 @@ func (r *gradeRepo) Upsert(grade *model.Grade) error {
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return err
 	}
-	
+
 	if existing != nil {
 		grade.ID = existing.ID
 		return r.Update(grade)
