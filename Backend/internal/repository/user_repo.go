@@ -13,6 +13,7 @@ type UserRepository interface {
 	Create(user *model.User) error
 	Update(user *model.User) error
 	Delete(id uint) error
+	Count() (int64, error)
 }
 
 type userRepo struct {
@@ -58,4 +59,12 @@ func (r *userRepo) Update(user *model.User) error {
 
 func (r *userRepo) Delete(id uint) error {
 	return r.db.Delete(&model.User{}, id).Error
+}
+
+func (r *userRepo) Count() (int64, error) {
+	var count int64
+	if err := r.db.Model(&model.User{}).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
 }

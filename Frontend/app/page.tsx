@@ -1,7 +1,11 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { apiBase } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { GraduationCap, Users, BookOpen, FileSpreadsheet, ArrowRight } from "lucide-react";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { GraduationCap, Users, BookOpen, FileSpreadsheet, ArrowRight, Settings } from "lucide-react";
 
 const features = [
   {
@@ -27,6 +31,23 @@ const features = [
 ];
 
 export default function HomePage() {
+  const [setupRequired, setSetupRequired] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    async function checkSetup() {
+      try {
+        const res = await fetch(`${apiBase()}/auth/setup`);
+        const json = await res.json();
+        if (json.code === 0) {
+          setSetupRequired(json.data?.setup_required ?? false);
+        }
+      } catch {
+        // 忽略错误
+      }
+    }
+    void checkSetup();
+  }, []);
+
   return (
     <main className="min-h-screen bg-background text-foreground">
       {/* Hero Section */}
@@ -43,17 +64,31 @@ export default function HomePage() {
             一个完整的教学管理解决方案，支持学生、教职工、院系、课程、选课及成绩的统一管理与查询，
             提升信息化水平，减少人工操作错误。
           </p>
-          <div className="mt-8 flex gap-4">
-            <Button size="lg" asChild>
-              <Link href="/login">
-                登录系统
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
+          <div className="mt-8 flex flex-wrap gap-4">
+            {setupRequired === true ? (
+              <Button size="lg" asChild>
+                <Link href="/setup">
+                  <Settings className="mr-2 h-4 w-4" />
+                  初始化系统
+                </Link>
+              </Button>
+            ) : (
+              <Button size="lg" asChild>
+                <Link href="/login">
+                  登录系统
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            )}
             <Button size="lg" variant="outline" asChild>
               <Link href="/dashboard">进入管理面板</Link>
             </Button>
           </div>
+          {setupRequired === true && (
+            <div className="mt-4 rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800">
+              <strong>提示：</strong>系统尚未初始化，请先创建管理员账号。
+            </div>
+          )}
         </div>
       </div>
 

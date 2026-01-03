@@ -4,7 +4,9 @@ CREATE TABLE IF NOT EXISTS departments (
   id BIGSERIAL PRIMARY KEY,
   dept_no TEXT NOT NULL UNIQUE,
   name TEXT NOT NULL,
-  intro TEXT NOT NULL DEFAULT ''
+  intro TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS students (
@@ -15,7 +17,9 @@ CREATE TABLE IF NOT EXISTS students (
   birth_date DATE,
   entry_score NUMERIC(6,2),
   dept_id BIGINT NOT NULL REFERENCES departments(id),
-  status TEXT NOT NULL DEFAULT 'in_school'
+  status TEXT NOT NULL DEFAULT 'in_school',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS students_history (
@@ -40,7 +44,9 @@ CREATE TABLE IF NOT EXISTS staff (
   dept_id BIGINT NOT NULL REFERENCES departments(id),
   title TEXT NOT NULL DEFAULT '',
   major TEXT NOT NULL DEFAULT '',
-  teaching_direction TEXT NOT NULL DEFAULT ''
+  teaching_direction TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS courses (
@@ -52,7 +58,9 @@ CREATE TABLE IF NOT EXISTS courses (
   credits INT NOT NULL DEFAULT 0,
   class_time TEXT NOT NULL DEFAULT '',
   class_location TEXT NOT NULL DEFAULT '',
-  exam_time TEXT NOT NULL DEFAULT ''
+  exam_time TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS terms (
@@ -60,7 +68,9 @@ CREATE TABLE IF NOT EXISTS terms (
   term_code TEXT NOT NULL UNIQUE,
   name TEXT NOT NULL,
   start_date DATE,
-  end_date DATE
+  end_date DATE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS enrollments (
