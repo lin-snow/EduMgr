@@ -3,7 +3,7 @@
 # =============================================================================
 
 .PHONY: help dev dev-backend dev-frontend dev-db build build-backend build-frontend \
-        up down logs clean migrate seed test gen
+        compile compile-backend compile-frontend up down logs clean migrate seed test gen
 
 # Default target
 .DEFAULT_GOAL := help
@@ -34,6 +34,11 @@ help: ## Show this help message
 	@echo "  make dev-db       - 仅启动数据库"
 	@echo "  make dev-backend  - 仅启动后端开发服务器"
 	@echo "  make dev-frontend - 仅启动前端开发服务器"
+	@echo ""
+	@echo "$(GREEN)本地编译:$(NC)"
+	@echo "  make compile          - 编译前后端（本地二进制/生产包）"
+	@echo "  make compile-backend  - 编译后端二进制文件"
+	@echo "  make compile-frontend - 编译前端生产版本"
 	@echo ""
 	@echo "$(GREEN)Docker 构建:$(NC)"
 	@echo "  make build          - 构建所有 Docker 镜像"
@@ -88,6 +93,24 @@ dev-backend: ## 启动后端开发服务器
 dev-frontend: ## 启动前端开发服务器
 	@echo "$(CYAN)>>> 启动前端开发服务器...$(NC)"
 	@cd $(FRONTEND_DIR) && pnpm dev
+
+# =============================================================================
+# Local Compile (本地编译)
+# =============================================================================
+compile: compile-backend compile-frontend ## 编译前后端
+	@echo "$(GREEN)>>> 编译完成!$(NC)"
+	@echo "    后端: $(BACKEND_DIR)/bin/api"
+	@echo "    前端: $(FRONTEND_DIR)/.next"
+
+compile-backend: ## 编译后端二进制文件
+	@echo "$(CYAN)>>> 编译后端...$(NC)"
+	@cd $(BACKEND_DIR) && CGO_ENABLED=0 go build -ldflags="-w -s" -o bin/api ./cmd/api
+	@echo "$(GREEN)>>> 后端编译完成: $(BACKEND_DIR)/bin/api$(NC)"
+
+compile-frontend: ## 编译前端生产版本
+	@echo "$(CYAN)>>> 编译前端...$(NC)"
+	@cd $(FRONTEND_DIR) && pnpm build
+	@echo "$(GREEN)>>> 前端编译完成: $(FRONTEND_DIR)/.next$(NC)"
 
 # =============================================================================
 # Docker Build
