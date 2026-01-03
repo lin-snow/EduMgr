@@ -3,6 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { apiBase, setToken } from "@/lib/api";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 type LoginResp = {
   token: string;
@@ -42,39 +47,32 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-background text-foreground p-6">
-      <div className="w-full max-w-sm rounded-xl border border-border bg-card p-6">
-        <h1 className="text-xl font-semibold">EduMgr 登录</h1>
-        <p className="mt-1 text-sm text-muted-foreground">请输入账号密码获取 JWT。</p>
-        <form onSubmit={onSubmit} className="mt-6 grid gap-4">
-          <label className="grid gap-2">
-            <span className="text-sm">用户名</span>
-            <input
-              className="h-10 rounded-md border border-input bg-background px-3"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-          </label>
-          <label className="grid gap-2">
-            <span className="text-sm">密码</span>
-            <input
-              className="h-10 rounded-md border border-input bg-background px-3"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </label>
-          {error ? <div className="text-sm text-destructive">{error}</div> : null}
-          <button
-            className="h-10 rounded-md bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-60"
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? "登录中..." : "登录"}
-          </button>
-        </form>
-      </div>
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle>EduMgr 登录</CardTitle>
+          <CardDescription>请输入账号密码获取 JWT。</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={onSubmit} className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="username">用户名</Label>
+              <Input id="username" value={username} onChange={(e) => setUsername(e.target.value)} required />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="password">密码</Label>
+              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            </div>
+            {error ? (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            ) : null}
+            <Button type="submit" disabled={loading}>
+              {loading ? "登录中..." : "登录"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </main>
   );
 }

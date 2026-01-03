@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { Section } from "../_components/Section";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 type Department = {
   id: number;
@@ -56,77 +60,74 @@ export default function DepartmentsPage() {
     <main className="min-h-screen bg-background text-foreground p-8">
       <div className="mx-auto grid max-w-5xl gap-6">
         <h1 className="text-2xl font-semibold">系管理（Departments）</h1>
-        {err ? <div className="text-sm text-destructive">{err}</div> : null}
+        {err ? (
+          <Alert variant="destructive">
+            <AlertDescription>{err}</AlertDescription>
+          </Alert>
+        ) : null}
 
         <Section title="查询">
           <div className="grid gap-3 sm:grid-cols-3">
-            <input
-              className="h-10 rounded-md border border-input bg-background px-3"
+            <Input
               placeholder="系号 dept_no"
               value={deptNo}
               onChange={(e) => setDeptNo(e.target.value)}
             />
-            <input
-              className="h-10 rounded-md border border-input bg-background px-3"
+            <Input
               placeholder="系名称 name"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
-            <button className="h-10 rounded-md bg-primary text-primary-foreground" onClick={() => void load()}>
+            <Button onClick={() => void load()}>
               查询
-            </button>
+            </Button>
           </div>
         </Section>
 
         <Section title="新增（admin 才能写）">
           <div className="grid gap-3 sm:grid-cols-3">
-            <input
-              className="h-10 rounded-md border border-input bg-background px-3"
+            <Input
               placeholder="dept_no"
               value={newDeptNo}
               onChange={(e) => setNewDeptNo(e.target.value)}
             />
-            <input
-              className="h-10 rounded-md border border-input bg-background px-3"
+            <Input
               placeholder="name"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
             />
-            <input
-              className="h-10 rounded-md border border-input bg-background px-3"
+            <Input
               placeholder="intro"
               value={newIntro}
               onChange={(e) => setNewIntro(e.target.value)}
             />
             <div className="sm:col-span-3">
-              <button className="h-10 rounded-md bg-primary px-4 text-primary-foreground" onClick={() => void create()}>
+              <Button onClick={() => void create()}>
                 新增
-              </button>
+              </Button>
             </div>
           </div>
         </Section>
 
         <Section title="列表">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="text-left text-muted-foreground">
-                <tr>
-                  <th className="py-2">dept_no</th>
-                  <th>name</th>
-                  <th>intro</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((it) => (
-                  <tr key={it.id} className="border-t border-border">
-                    <td className="py-2 font-mono">{it.dept_no}</td>
-                    <td>{it.name}</td>
-                    <td className="text-muted-foreground">{it.intro}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>dept_no</TableHead>
+                <TableHead>name</TableHead>
+                <TableHead>intro</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {items.map((it) => (
+                <TableRow key={it.id}>
+                  <TableCell className="font-mono">{it.dept_no}</TableCell>
+                  <TableCell>{it.name}</TableCell>
+                  <TableCell className="text-muted-foreground">{it.intro}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </Section>
       </div>
     </main>

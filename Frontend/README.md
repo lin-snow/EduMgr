@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## EduMgr Frontend（Next.js + Tailwind v4 + pnpm）
 
-## Getting Started
+### 环境变量
 
-First, run the development server:
+复制 `Frontend/env.example` 为 `Frontend/.env.local`（或用你自己的方式注入环境变量），并按需修改：
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+NEXT_PUBLIC_API_BASE=http://localhost:8080
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 安装与运行（本地）
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+在 `Frontend/` 目录下：
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+corepack enable
+pnpm install
+pnpm dev
+```
 
-## Learn More
+- Frontend: `http://localhost:3000`
+- Backend: `http://localhost:8080/healthz`
 
-To learn more about Next.js, take a look at the following resources:
+### 页面入口
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `/login`：登录（获取 JWT，存储在 localStorage）
+- `/dashboard`：管理面板入口
+- `/dashboard/*`：系/学生/教职工/课程/选课/成绩/报表（最小可用实现，对齐 PRD）
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 注意事项
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- 写操作需要 `admin`（后端会拦截非 admin 的 POST/PUT/DELETE）
+- 选课页面目前只做“提交选课”；若要展示“选课列表并退课”，需要后端提供 enrollments 查询接口

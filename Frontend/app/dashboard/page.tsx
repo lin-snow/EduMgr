@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Section } from "./_components/Section";
 
 const links = [
   { href: "/dashboard/departments", label: "系管理（Departments）" },
@@ -12,24 +14,23 @@ const links = [
 
 export default function DashboardHome() {
   return (
-    <main className="min-h-screen bg-background text-foreground p-8">
-      <div className="mx-auto max-w-3xl">
+    <main className="grid gap-6">
+      <div>
         <h1 className="text-2xl font-semibold">管理面板</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           先把功能跑通：CRUD / 选课 / 成绩 / 报表（对齐 PRD）。
         </p>
-        <div className="mt-6 grid gap-3">
+      </div>
+
+      <Section title="功能入口">
+        <div className="grid gap-3 sm:grid-cols-2">
           {links.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className="rounded-md border border-border bg-card p-4 hover:bg-accent"
-            >
-              {l.label}
-            </Link>
+            <Button key={l.href} variant="outline" className="justify-start" asChild>
+              <Link href={l.href}>{l.label}</Link>
+            </Button>
           ))}
         </div>
-      </div>
+      </Section>
     </main>
   );
 }

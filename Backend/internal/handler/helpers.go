@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// pathUint extracts a uint path parameter
 func pathUint(c echo.Context, name string) (uint, error) {
 	s := c.Param(name)
 	n, err := strconv.ParseUint(s, 10, 64)
@@ -14,4 +15,3 @@ func pathUint(c echo.Context, name string) (uint, error) {
 	}
 	return uint(n), nil
 }
-

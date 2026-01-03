@@ -1,3 +1,5 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 export function Section({
   title,
   children,
@@ -6,10 +8,12 @@ export function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-xl border border-border bg-card p-5">
-      <div className="text-lg font-semibold">{title}</div>
-      <div className="mt-4">{children}</div>
-    </section>
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle>{title}</CardTitle>
+      </CardHeader>
+      <CardContent>{children}</CardContent>
+    </Card>
   );
 }
 

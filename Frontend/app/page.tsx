@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function HomePage() {
   return (
@@ -9,12 +10,12 @@ export default function HomePage() {
           这是课设实现项目。请先登录，然后进入管理面板。
         </p>
         <div className="mt-6 flex gap-4">
-          <Link className="rounded-md bg-primary px-4 py-2 text-primary-foreground" href="/login">
-            登录
-          </Link>
-          <Link className="rounded-md border border-border px-4 py-2" href="/dashboard">
-            管理面板
-          </Link>
+          <Button asChild>
+            <Link href="/login">登录</Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href="/dashboard">管理面板</Link>
+          </Button>
         </div>
       </div>
     </main>
